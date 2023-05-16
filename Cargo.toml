@@ -1,0 +1,48 @@
+[package]
+name = "gst-openaichat"
+version = "0.1.0"
+edition = "2021"
+license = "MIT/Apache-2.0"
+readme = "README.md"
+authors = ["Jasper Hugo <jasper@avstack.io>"]
+description = "A GStreamer filter implementing conversation with the OpenAI Chat API"
+repository = "https://github.com/avstack/gst-openaichat"
+
+[dependencies]
+gstreamer = { version = "0.20", default-features = false }
+gstreamer-base = { version = "0.20", default-features = false }
+hyper = { version = "0.14", default-features = false, features = ["client", "http1", "http2", "tcp"] }
+hyper-rustls = { version = "0.24", default-features = false, features = ["native-tokio", "http1", "http2", "tls12", "logging"] }
+once_cell = { version = "1", default-features = false, features = ["std"] }
+serde = { version = "1", default-features = false, features = ["derive"] }
+serde_json = { version = "1", default-features = false, features = ["std"] }
+tokio = { version = "1", default-features = false, features = ["rt-multi-thread"] }
+
+[dev-dependencies]
+gstreamer-check = { version = "0.20", default-features = false }
+
+[build-dependencies]
+gst-plugin-version-helper = { version = "0.7", default-features = false }
+
+[lib]
+name = "gstopenaichat"
+crate-type = ["cdylib", "rlib"]
+path = "src/lib.rs"
+
+[features]
+static = []
+capi = []
+doc = ["gstreamer/v1_22"]
+
+[package.metadata.capi]
+min_version = "0.8.0"
+
+[package.metadata.capi.header]
+enabled = false
+
+[package.metadata.capi.library]
+install_subdir = "gstreamer-1.0"
+versioning = false
+
+[package.metadata.capi.pkg_config]
+requires_private = "gstreamer-1.0, gstreamer-base-1.0, gobject-2.0, glib-2.0, gmodule-2.0"
