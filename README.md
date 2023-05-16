@@ -8,10 +8,10 @@ Example usage (chat with GPT in your console):
 OPENAI_API_KEY=... gst-launch-1.0 --quiet fdsrc ! 'text/x-raw,format=utf8' ! openaichat model=gpt-3.5-turbo ! fdsink
 ```
 
-Combine it with our [gst-whisper](https://github.com/avstack/gst-whisper) element and talk to GPT:
+Combine it with our [whisper](https://github.com/avstack/gst-whisper) and [ttssink](https://github.com/avstack/gst-ttssink) elements and have a spoken conversation with GPT! (Use headphones, or GPT may respond to itself.)
 
 ```
-OPENAI_API_KEY=... gst-launch-1.0 --quiet autoaudiosrc ! audioconvert ! audioresample ! queue ! whisper ! openaichat model=gpt-3.5-turbo ! fdsink
+OPENAI_API_KEY=... gst-launch-1.0 --quiet autoaudiosrc ! audioconvert ! audioresample ! queue ! whisper ! openaichat model=gpt-3.5-turbo ! ttssink
 ```
 
 ## License
