@@ -1,4 +1,7 @@
-use std::{env, str, sync::Mutex};
+use std::{
+  env, str,
+  sync::{Arc, Mutex},
+};
 
 use gstreamer::{
   glib::{self, ParamSpec, Value},
@@ -66,13 +69,13 @@ struct Settings {
 
 #[derive(Default)]
 struct State {
-  history: Vec<OpenaiChatCompletionMessage<'static>>,
+  history: Vec<OpenaiChatCompletionMessage>,
 }
 
 pub struct OpenaiChatFilter {
   #[allow(dead_code)]
   settings: Mutex<Settings>,
-  state: Mutex<State>,
+  state: Arc<Mutex<State>>,
 }
 
 #[glib::object_subclass]
@@ -87,7 +90,7 @@ impl ObjectSubclass for OpenaiChatFilter {
       settings: Mutex::new(Settings {
         model: DEFAULT_MODEL.into(),
       }),
-      state: Mutex::new(Default::default()),
+      state: Arc::new(Mutex::new(Default::default())),
     }
   }
 }
@@ -109,15 +112,12 @@ impl ObjectImpl for OpenaiChatFilter {
   }
 
   fn set_property(&self, _id: usize, value: &Value, pspec: &ParamSpec) {
+    let mut settings = self.settings.lock().unwrap();
     match pspec.name() {
       "model" => {
-        let mut settings = self.settings.lock().unwrap();
-        settings.model = match value.get::<String>() {
-          Ok(model) => model,
-          _ => unreachable!("type checked upstream"),
-        };
+        settings.model = value.get().unwrap();
       },
-      _ => unimplemented!(),
+      other => panic!("no such property: {}", other),
     }
   }
 
@@ -127,7 +127,7 @@ impl ObjectImpl for OpenaiChatFilter {
         let settings = self.settings.lock().unwrap();
         settings.model.to_value()
       },
-      name => panic!("No getter for {name}"),
+      other => panic!("no such property: {}", other),
     }
   }
 }
@@ -218,6 +218,8 @@ impl BaseTransformImpl for OpenaiChatFilter {
         messages,
       };
 
+      let state = self.state.clone();
+
       RUNTIME.spawn(async move {
         let request = Request::builder()
           .method(Method::POST)
@@ -231,7 +233,9 @@ impl BaseTransformImpl for OpenaiChatFilter {
           let response_body = hyper::body::to_bytes(response).await.unwrap();
           let response_body: OpenAiChatCompletionResponse =
             serde_json::from_slice(&response_body).unwrap();
-          let content = format!("{}\n", response_body.choices[0].message.content);
+          let message = &response_body.choices[0].message;
+          state.lock().unwrap().history.push(message.clone());
+          let content = format!("{}\n", message.content);
           let mut buffer = Buffer::with_size(content.len()).unwrap();
           buffer
             .get_mut()

@@ -1,39 +1,30 @@
-use std::borrow::Cow;
-
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize)]
-pub struct OpenaiChatCompletionRequest<'a> {
-  pub model: &'a str,
-  pub messages: Vec<OpenaiChatCompletionMessage<'a>>,
+pub struct OpenaiChatCompletionRequest {
+  pub model: String,
+  pub messages: Vec<OpenaiChatCompletionMessage>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct OpenaiChatCompletionMessage<'a> {
-  #[serde(borrow)]
-  pub role: Cow<'a, str>,
-  #[serde(borrow)]
-  pub content: Cow<'a, str>,
+pub struct OpenaiChatCompletionMessage {
+  pub role: String,
+  pub content: String,
 }
 
 #[derive(Deserialize)]
-pub struct OpenAiChatCompletionResponse<'a> {
-  #[serde(borrow)]
-  pub id: Cow<'a, str>,
-  #[serde(borrow)]
-  pub object: Cow<'a, str>,
+pub struct OpenAiChatCompletionResponse {
+  pub id: String,
+  pub object: String,
   pub created: u64,
-  #[serde(borrow)]
-  pub choices: Vec<OpenaiChatCompletionResponseChoice<'a>>,
+  pub choices: Vec<OpenaiChatCompletionResponseChoice>,
 }
 
 #[derive(Deserialize)]
-pub struct OpenaiChatCompletionResponseChoice<'a> {
+pub struct OpenaiChatCompletionResponseChoice {
   pub index: usize,
-  #[serde(borrow)]
-  pub message: OpenaiChatCompletionMessage<'a>,
-  #[serde(borrow)]
-  pub finish_reason: Cow<'a, str>,
+  pub message: OpenaiChatCompletionMessage,
+  pub finish_reason: String,
 }
 
 #[derive(Deserialize)]
