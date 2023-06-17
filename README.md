@@ -11,7 +11,8 @@ cargo install cargo-c
 
 git clone https://github.com/avstack/gst-openaichat
 cd gst-openaichat
-cargo cinstall
+cargo cbuild --release
+export GST_PLUGIN_PATH=$(pwd)/target/release
 ```
 
 ## Example usage (chat with GPT in your console)
