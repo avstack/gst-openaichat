@@ -2,7 +2,19 @@
 
 Accepts text buffers on its sink pad, sends them to the OpenAI Chat API, and produces the responses as text buffers on its source pad.
 
-Example usage (chat with GPT in your console):
+## Installation
+
+gst-openaichat is written in Rust and uses the cargo-c helper. Set up a Rust development environment (e.g. using [rustup](https://rustup.rs)) and then:
+
+```
+cargo install cargo-c
+
+git clone https://github.com/avstack/gst-openaichat
+cd gst-openaichat
+cargo cinstall
+```
+
+## Example usage (chat with GPT in your console)
 
 ```
 OPENAI_API_KEY=... gst-launch-1.0 --quiet fdsrc ! 'text/x-raw,format=utf8' ! openaichat model=gpt-3.5-turbo ! fdsink
